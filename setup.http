@@ -1,0 +1,74 @@
+### Get Token
+POST http://localhost:9090/realms/master/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=password&username=admin&password=admin&client_id=admin-cli
+
+> {%
+ client.global.set("token", response.body.access_token);
+%}
+
+### Create App
+POST http://localhost:9090/admin/realms/master/clients
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "clientId": "react",
+  "name": "react",
+  "description": "sample react oidc",
+  "rootUrl": "http://localhost:3000",
+  "baseUrl": "http://localhost:3000",
+  "enabled": true,
+  "clientAuthenticatorType": "client-secret",
+  "redirectUris": [
+    "http://localhost:3000/auth/callback"
+  ],
+  "webOrigins": [
+    "http://localhost:3000"
+  ],
+  "standardFlowEnabled": true,
+  "directAccessGrantsEnabled": true,
+  "publicClient": true,
+  "frontchannelLogout": true,
+  "protocol": "openid-connect",
+  "attributes": {
+    "post.logout.redirect.uris": "http://localhost:3000",
+    "oauth2.device.authorization.grant.enabled": "false",
+    "backchannel.logout.revoke.offline.tokens": "false",
+    "use.refresh.tokens": "true",
+    "tls-client-certificate-bound-access-tokens": "false",
+    "oidc.ciba.grant.enabled": "false",
+    "backchannel.logout.session.required": "true",
+    "client_credentials.use_refresh_token": "false",
+    "acr.loa.map": "{}",
+    "require.pushed.authorization.requests": "false",
+    "display.on.consent.screen": "false",
+    "token.response.type.bearer.lower-case": "false"
+  },
+  "fullScopeAllowed": true,
+  "defaultClientScopes": ["profile", "email"],
+  "optionalClientScopes": [],
+  "access": {
+    "view": true,
+    "configure": true,
+    "manage": true
+  }
+}
+
+### Create User
+POST http://localhost:9090/admin/realms/master/users
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "username": "user",
+  "enabled": true,
+  "firstName": "Test",
+  "lastName": "User",
+  "credentials": [
+    {
+      "value": "password"
+    }
+  ]
+}
